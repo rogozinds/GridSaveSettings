@@ -11,25 +11,33 @@ import com.vaadin.data.Container.Indexed;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 
-public class GridSaveSettings extends Grid {
+/**
+ * Use this class to save grid hidden columns to cookies.
+ * Use {@link #attachToGrid(Grid, String) }
+ *
+ */
+public class GridUtils {
 
 	private final String SETTINGS_NAME;
-	public GridSaveSettings(String cookieName) {
-		super();
-		SETTINGS_NAME=cookieName;
-		
+	private Grid grid;
+	/**
+	 * Set specified grid to save hidden columns in cookies.
+	 * @param grid - grid which columns would be used
+	 * @param cookieName - name of the cookie. Should be unique for every grid.
+	 */
+	static public void attachToGrid(Grid grid, String cookieName) {
+		GridUtils utils=new GridUtils(grid, cookieName);
 	}
-	@Override
-	public void setContainerDataSource(Indexed container) {
-		super.setContainerDataSource(container);
-		getColumns().forEach(column -> {
-			column.setHidable(true);
-		});
+	private GridUtils(Grid grid, String cookieName) {
+		super();
+		this.grid=grid;
+		SETTINGS_NAME=cookieName;
 		loadSettings();
-		addColumnVisibilityChangeListener(e->{
+		grid.addColumnVisibilityChangeListener(e->{
 			saveSettings();
 		});
 	}
+	
 	private void loadSettings() {
 		Callback saveFunc=new Callback() {
 			@Override
@@ -37,7 +45,7 @@ public class GridSaveSettings extends Grid {
 				if(value!=null) {
 					String[] hiddenColumns=value.split(":");
 					Arrays.stream(hiddenColumns).forEach(col -> {
-						Column column = getColumn(col);
+						Column column = grid.getColumn(col);
 						if(column!=null) {
 							column.setHidden(true);
 						}
@@ -49,7 +57,7 @@ public class GridSaveSettings extends Grid {
 	}
 	
 	private void saveSettings() {
-		Optional<String> value = getColumns().stream().filter(c -> c.isHidden())
+		Optional<String> value = grid.getColumns().stream().filter(c -> c.isHidden())
 				.map(a -> a.getPropertyId().toString())
 				.reduce((a, b) -> a + ":" + b);
 

@@ -51,7 +51,7 @@ public class TestvaadinUI extends UI {
 	}
 
 
-	GridSaveSettings table;
+	Grid table;
 	private BeanItemContainer<DataObject> ds = new BeanItemContainer<DataObject>(
 			DataObject.class);
 
@@ -66,12 +66,19 @@ public class TestvaadinUI extends UI {
 		ds.addBean(new DataObject("1", "Name", "LastName"));
 		ds.addBean(new DataObject("2", "Name2", "LastName2"));
 		ds.addBean(new DataObject("3", "Name3", "LastName3"));
-		table = new GridSaveSettings(SETTINGS_NAME);
-
+		table = new Grid(SETTINGS_NAME);
 		table.setContainerDataSource(ds);
+		makeGridColumnsHideable(table);
+		GridUtils.attachToGrid(table,"userGrid");
 		setContent(layout);
 		layout.addComponent(info);
 		layout.addComponent(table);
 
+	}
+	
+	private void makeGridColumnsHideable(Grid grid) {
+		grid.getColumns().forEach(c->{
+			c.setHidable(true);
+		});
 	}
 }
